@@ -41,9 +41,6 @@ class LoginDialog(QDialog):
         user = authenticate(login, pwd)
         if user:
             self.user = user
-            if user.role == Role.admin:
-                self.panel = AdminPanel()
-                self.panel.show() 
             self.accept()
         else:
             QMessageBox.warning(self, "Error", "Invalid credentials")

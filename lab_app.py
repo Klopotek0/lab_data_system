@@ -87,9 +87,6 @@ def register_user(login, password, first_name, last_name, birthdate, role):
 
 # ---- GUI ----
 
-
-
-
 class LoginDialog(QDialog):
     def __init__(self):
         super().__init__()

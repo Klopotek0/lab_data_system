@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QApplication, QDialog
 from database import engine
 from models import Base
 from services.seed import ensure_premade_users
-from gui.login_dialog import LoginDialog
+from gui.login_panel import LoginDialog
 from gui.main_window import MainWindow
 
 Base.metadata.create_all(engine)

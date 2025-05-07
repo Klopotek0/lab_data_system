@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QTableWidget, QTableWidgetItem, QMessageBox
 
-#TODO: Implement the DoctorPanel class
-class DoctorPanel(QWidget):
+#TODO: Implement the PatientPanel class
+class PatientPanel(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Doctor Panel")
+        self.setWindowTitle("Patient Panel")
