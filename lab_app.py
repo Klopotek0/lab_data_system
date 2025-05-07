@@ -10,55 +10,18 @@ import bcrypt
 from PySide6.QtWidgets import (
     QApplication, QDialog, QMainWindow,
     QLabel, QLineEdit, QPushButton, QVBoxLayout,
-    QWidget, QMessageBox, QHBoxLayout
+    QWidget, QMessageBox, QHBoxLayout, QComboBox
 )
 from sqlalchemy import (
     create_engine, Column, Integer, String,
-    DateTime, Enum, ForeignKey
+    DateTime, Enum, ForeignKey, Boolean
 )
 from sqlalchemy.orm import sessionmaker, declarative_base
+from models import User, Role, Base
 
 # ---- Database setup ----
 engine = create_engine("sqlite:///lab.db", echo=False)
 Session = sessionmaker(bind=engine)
-Base = declarative_base()
-
-class Role(enum.Enum):
-    admin = "Administrator"
-    labtech = "Laborant"
-    doctor = "Lekarz"
-    patient = "Pacjent"
-
-class User(Base):
-    __tablename__ = "users"
-    id = Column(Integer, primary_key=True)
-    login = Column(String, unique=True, nullable=False)
-    pw_hash = Column(String, nullable=False)
-    role = Column(Enum(Role), nullable=False)
-    __mapper_args__ = {"polymorphic_on": role}
-
-class Patient(User):
-    __tablename__ = "patients"
-    id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
-    birthdate = Column(DateTime, nullable=False)
-    __mapper_args__ = {"polymorphic_identity": Role.patient}
-
-class Admin(User):
-    __tablename__ = "admins"
-    id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    __mapper_args__ = {"polymorphic_identity": Role.admin}
-
-class Doctor(User):
-    __tablename__ = "doctors"
-    id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    __mapper_args__ = {"polymorphic_identity": Role.doctor}
-
-class Labtech(User):
-    __tablename__ = "labtechs"
-    id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    __mapper_args__ = {"polymorphic_identity": Role.labtech}
 
 Base.metadata.create_all(engine)
 
@@ -67,14 +30,17 @@ Base.metadata.create_all(engine)
 def ensure_premade_users():
     session = Session()
     users = [
-        {"login": "admin", "password": "admin", "class": Admin, "role": Role.admin},
-        {"login": "doctor", "password": "doctor123", "class": Doctor, "role": Role.doctor},
+        {"login": "admin", "password": "admin", "role": Role.admin},
+        {"login": "doctor", "password": "doctor123", "role": Role.doctor},
     ]
     for data in users:
         if not session.query(User).filter_by(login=data["login"]).first():
             pw_hash = bcrypt.hashpw(data["password"].encode(), bcrypt.gensalt()).decode()
-            user = data["class"](
-                login=data["login"], pw_hash=pw_hash, role=data["role"]
+            user = User(
+                login=data["login"],
+                pw_hash=pw_hash,
+                role=data["role"],
+                is_approved=True
             )
             session.add(user)
     session.commit()
@@ -87,85 +53,42 @@ def authenticate(login: str, password: str):
     session = Session()
     user = session.query(User).filter_by(login=login).first()
     if user and bcrypt.checkpw(password.encode(), user.pw_hash.encode()):
+        if user.role != Role.patient and not user.is_approved:
+            session.close()
+            return None
         session.expunge(user)
         session.close()
         return user
     session.close()
     return None
 
-def register_patient(login, password, first_name, last_name, birthdate):
+def register_user(login, password, first_name, last_name, birthdate, role):
     session = Session()
     if session.query(User).filter_by(login=login).first():
         session.close()
         return None
     pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-    patient = Patient(
-        login=login, pw_hash=pw_hash,
-        first_name=first_name, last_name=last_name,
-        birthdate=birthdate, role=Role.patient
+    approved = True if role == Role.patient else False
+    user = User(
+        login=login,
+        pw_hash=pw_hash,
+        first_name=first_name,
+        last_name=last_name,
+        birthdate=birthdate,
+        role=role,
+        is_approved=approved
     )
-    session.add(patient)
+    session.add(user)
     session.commit()
-    session.refresh(patient)
+    session.refresh(user)
     session.close()
-    return patient
+    return user
+
 
 # ---- GUI ----
 
-class RegisterDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Register Patient")
-        self.login_input = QLineEdit()
-        self.login_input.setPlaceholderText("Login")
-        self.pwd_input = QLineEdit()
-        self.pwd_input.setPlaceholderText("Password")
-        self.pwd_input.setEchoMode(QLineEdit.Password)
-        self.first_name_input = QLineEdit()
-        self.first_name_input.setPlaceholderText("First Name")
-        self.last_name_input = QLineEdit()
-        self.last_name_input.setPlaceholderText("Last Name")
-        self.birthdate_input = QLineEdit()
-        self.birthdate_input.setPlaceholderText("Birthdate YYYY-MM-DD")
 
-        self.btn_submit = QPushButton("Submit")
-        self.btn_cancel = QPushButton("Cancel")
 
-        layout = QVBoxLayout()
-        layout.addWidget(self.login_input)
-        layout.addWidget(self.pwd_input)
-        layout.addWidget(self.first_name_input)
-        layout.addWidget(self.last_name_input)
-        layout.addWidget(self.birthdate_input)
-        btn_layout = QHBoxLayout()
-        btn_layout.addWidget(self.btn_submit)
-        btn_layout.addWidget(self.btn_cancel)
-        layout.addLayout(btn_layout)
-        self.setLayout(layout)
-
-        self.btn_submit.clicked.connect(self.handle_submit)
-        self.btn_cancel.clicked.connect(self.reject)
-
-    def handle_submit(self):
-        login = self.login_input.text().strip()
-        pwd = self.pwd_input.text().strip()
-        first = self.first_name_input.text().strip()
-        last = self.last_name_input.text().strip()
-        bd_text = self.birthdate_input.text().strip()
-        if not all([login, pwd, first, last, bd_text]):
-            QMessageBox.warning(self, "Error", "All fields are required")
-            return
-        try:
-            bd = datetime.datetime.strptime(bd_text, "%Y-%m-%d")
-        except ValueError:
-            QMessageBox.warning(self, "Error", "Invalid birthdate format")
-            return
-        user = register_patient(login, pwd, first, last, bd)
-        if user:
-            QMessageBox.information(self, "Success", "Registration successful")
-            self.accept()
-        else:
-            QMessageBox.warning(self, "Error", "User already exists")
 
 class LoginDialog(QDialog):
     def __init__(self):
