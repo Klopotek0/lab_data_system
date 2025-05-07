@@ -44,6 +44,7 @@ class LoginDialog(QDialog):
             self.accept()
         else:
             QMessageBox.warning(self, "Error", "Invalid credentials")
+            
 
     def open_register(self):
         dlg = RegisterDialog()

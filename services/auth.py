@@ -54,3 +54,17 @@ def approve_user(user_id):
         user.is_approved = True
         session.commit()
     session.close()
+
+def get_users_by_role(role: Role):
+    session = Session()
+    users = session.query(User).filter_by(role=role, is_approved=True).all()
+    session.close()
+    return users
+
+def delete_user(user_id):
+    session = Session()
+    user = session.query(User).filter_by(id=user_id).first()
+    if user:
+        session.delete(user)
+        session.commit()
+    session.close()

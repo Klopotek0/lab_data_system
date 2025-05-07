@@ -8,12 +8,12 @@
 
   - Administrator
     Możliwości:
-    - Zarządzanie użytkownikami (lekarze, technicy), 
+    - Zarządzanie użytkownikami (lekarze, technicy),  -> Zrobione
     - Resetowanie haseł, [?]
     - Przegląd aktywności,
     - Weryfikacja logów. [?] - opcjonalnie
     Panel:
-    - Tabela użytkowników,
+    - Tabela użytkowników, -> Zrobione
     - Ustawienia systemowe,
     - Statystyki. [?] - opcjonalnie
 

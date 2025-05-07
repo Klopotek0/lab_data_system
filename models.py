@@ -5,10 +5,10 @@ import enum
 Base = declarative_base()
 
 class Role(enum.Enum):
-    admin = "Administrator"
-    labtech = "Laborant"
-    doctor = "Lekarz"
-    patient = "Pacjent"
+    admin = "Admin"
+    labtech = "Laborer"
+    doctor = "Doctor"
+    patient = "Patient"
 
 class User(Base):
     __tablename__ = "users"
@@ -20,3 +20,4 @@ class User(Base):
     last_name = Column(String)
     birthdate = Column(DateTime)
     is_approved = Column(Boolean, default=False)
+ 
