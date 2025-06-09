@@ -8,35 +8,35 @@
 
   - Administrator
     Możliwości:
-    - Zarządzanie użytkownikami (lekarze, technicy),  -> Zrobione
-    - Resetowanie haseł, [?]
-    - Przegląd aktywności,
+    - Zarządzanie użytkownikami (lekarze, technicy), ✅
+    - Resetowanie haseł, 
+    - Przegląd aktywności, 
     - Weryfikacja logów. [?] - opcjonalnie
     Panel:
-    - Tabela użytkowników, -> Zrobione
+    - Tabela użytkowników, ✅
     - Ustawienia systemowe,
     - Statystyki. [?] - opcjonalnie
 
   - Lekarz
     Możliwości:
-    - Składanie nowych zleceń laboratoryjnych dla pacjentów, 
-    - Podgląd wyników badań pacjentów,
-    - Przegląd historii zleceń.
+    - Składanie nowych zleceń laboratoryjnych dla pacjentów, ✅
+    - Podgląd wyników badań pacjentów, 
+    - Przegląd historii zleceń. ✅
     Panel:
-    - Formularz nowego zlecenia,
-    - Lista pacjentów,
-    - Wyniki badań.
+    - Formularz nowego zlecenia, ✅
+    - Lista pacjentów, ✅
+    - Wyniki badań. ✅
 
   - Laborant / Technik
     Możliwości:
-    - Odbieranie zleceń,
-    - Dodawanie informacji o próbkach,
-    - Wprowadzanie wyników badań,
-    - Zatwierdzanie / aktualizacja statusów.
+    - Odbieranie zleceń, ✅
+    - Dodawanie informacji o próbkach, 
+    - Wprowadzanie wyników badań, ✅
+    - Zatwierdzanie / aktualizacja statusów. ✅
     Panel:
-    - Lista otwartych zleceń,
-    - Formularz rejestracji próbki,
-    - Formularz dodawania wyników.
+    - Lista otwartych zleceń, ✅
+    - Formularz rejestracji próbki, ✅
+    - Formularz dodawania wyników. ✅
 
   - Pacjent
     Możliwości:
@@ -85,10 +85,10 @@
 
 ### 🧪 Obsługa próbek i wyników
 
-- [ ] Dodawanie próbki (lab_tech)
-- [ ] Dodawanie wyników (lab_tech)
-- [ ] Oznaczanie wyników jako „poza normą”
-- [ ] Zakończenie badania / zlecenia
+- [x] Dodawanie próbki (lab_tech)
+- [x] Dodawanie wyników (lab_tech)
+- [x] Oznaczanie wyników jako „poza normą”
+- [x] Zakończenie badania / zlecenia
 
 ### 📤 Wymiana danych
 

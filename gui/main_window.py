@@ -6,12 +6,46 @@ from gui.patient_panel import PatientPanel
 from models import Role
 from gui.login_panel import LoginDialog
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QPushButton, QHBoxLayout, QSpacerItem, QSizePolicy, QMessageBox
+from PySide6.QtCore import Signal
+from PySide6.QtGui import QIcon
 
 class MainWindow(QMainWindow):
+
+    logout_requested = Signal()
+
     def __init__(self, user):
         super().__init__()
         self.user = user
         self.setWindowTitle(f"Lab App - {user.role.value}")
+        self.setWindowIcon(QIcon("gui/assets/icon.png"))
+        
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #210f37;
+                color: #000080;
+                font-size: 15px;
+                font-family: 'Raleway';
+            }
+            QPushButton {
+                background-color: #51227e;
+                color: #fffefe;
+                padding: 12px 20px;
+                border-radius: 12px;
+                font-size: 15px;
+                font-family: 'Raleway';
+            }
+          QPushButton:hover {
+                background-color: #682da1;
+            }
+            QLabel {
+                font-family: 'Raleway';
+                font-size: 14px;
+                color: #f5ebff;
+                font-weight: bold;
+                margin-left: 10px;
+            }
+        """)
+
         logout_btn = QPushButton("Logout")
         logout_btn.clicked.connect(self.handle_logout) 
 
@@ -44,8 +78,5 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
     def handle_logout(self):
-        self.close() 
-        login_dialog = LoginDialog()
-        if login_dialog.exec() == QDialog.Accepted:
-            new_main = MainWindow(login_dialog.user)
-            new_main.show()
+        self.close()
+        self.logout_requested.emit()

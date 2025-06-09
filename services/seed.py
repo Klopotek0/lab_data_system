@@ -5,9 +5,8 @@ from database import Session
 def ensure_premade_users():
     session = Session()
     users = [
-        {"login": "admin", "password": "admin", "role": Role.admin},
-        {"login": "doctor", "password": "doctor123", "role": Role.doctor},
-    ]
+        {"login": "admin", "password": "admin", "role": Role.admin}
+               ]
     for data in users:
         if not session.query(User).filter_by(login=data["login"]).first():
             pw_hash = bcrypt.hashpw(data["password"].encode(), bcrypt.gensalt()).decode()
